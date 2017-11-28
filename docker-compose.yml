@@ -1,0 +1,68 @@
+version: "3"
+services:
+
+  nginx:
+    build: "nginx"
+    ports:
+      - "80:80"
+
+  ipfs:
+    image: "ipfs/go-ipfs:v0.4.11"
+    ports:
+      - "8080"
+      - "5001"
+    volumes:
+      - "ipfs-data:/data/ipfs"
+
+  make-pull:
+    build: "make-pull"
+    ports:
+      - "80"
+    volumes:
+      - "ssh-data:/root/.ssh"
+      - "shared:/data"
+    environment:
+      GIT_REPO: ${GIT_REPO}
+      REPO_DIR: "/data/repo"
+
+  make-build:
+    build: "make-build"
+    ports:
+      - "80"
+    volumes:
+      - "shared:/data"
+    environment:
+      BUILD_DIR: "/data/repo"
+
+  make-publish:
+    build: "make-publish"
+    ports:
+      - "80"
+    volumes:
+      - "shared:/data"
+    environment:
+      IPFS_HOST: "ipfs"
+      DATA_DIR: "/data/repo/_site"
+
+  make:
+    build: "make"
+    ports:
+      - "80"
+    environment:
+      ONESHOT_AUTH: "github"
+      ONESHOT_AUTH_KEY: ${GITHUB_TOKEN}
+
+  scheduler:
+    build: "scheduler"
+
+  ubuntu:
+    image: ubuntu
+    stdin_open: true
+    tty: true
+    volumes:
+      - "shared:/shared"
+
+volumes:
+  ipfs-data:
+  ssh-data:
+  shared:
