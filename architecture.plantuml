@@ -1,0 +1,92 @@
+@startuml architecture
+
+node nginx
+
+rectangle "Build Pipeline" {
+    node make [
+        **make**
+    ]
+
+    node make_pull [
+        **make-pull**
+        ..
+        //pulls git repo//
+        //using ssh//
+    ]
+
+    node make_build [
+        **make-build**
+        ..
+        //builds site using//
+        //static site generator//
+    ]
+
+    node make_publish [
+        **make-publish**
+        ..
+        //publishes assets//
+        //on the IPFS node//
+        ..
+        //publishes hash of//
+        //new assets under//
+        //node's address//
+    ]
+
+    database shared [
+        **shared**
+        ..
+        //keeps repository data//
+        //and built assets//
+    ]
+
+    database ssh_data [
+        **ssh-data**
+        ..
+        //keeps SSH key//
+        //for authentication//
+    ]
+
+    make_pull .. shared
+    make_build .. shared
+    make_publish .. shared
+
+    make_pull .left. ssh_data
+}
+
+node scheduler [
+    publish
+    scheduler
+]
+
+node ipfs [
+   IPFS
+]
+
+database ipfs_data [
+    ipfs-data
+]
+
+ipfs .. ipfs_data
+
+cloud web
+
+cloud github [
+    GitHub blog
+    repository
+]
+
+nginx <=> web: web traffic
+ipfs <=> nginx: proxy requests for\nfiles to IPFS
+
+github -down-> make: trigger on push to repo
+make_pull -up-> github: pull new changes
+
+make -left-> make_pull: trigger\nstage 1
+make --> make_build: trigger\nstage 2
+make --> make_publish: trigger\nstage 3
+
+make_publish -right-> ipfs: publish files +\npublish name
+
+scheduler -down--> make_publish: trigger\nevery 6 hours\nbecause IPNS\nentries expire
+
+@enduml
