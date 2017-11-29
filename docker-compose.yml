@@ -55,13 +55,6 @@ services:
   scheduler:
     build: "scheduler"
 
-  ubuntu:
-    image: ubuntu
-    stdin_open: true
-    tty: true
-    volumes:
-      - "shared:/shared"
-
 volumes:
   ipfs-data:
   ssh-data:
