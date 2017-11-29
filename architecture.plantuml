@@ -60,7 +60,14 @@ node scheduler [
 
 node ipfs [
    IPFS
+   node
 ]
+
+cloud ipfs_network [
+    IPFS network
+]
+
+ipfs <==> ipfs_network
 
 database ipfs_data [
     ipfs-data
