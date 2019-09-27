@@ -1,3 +1,5 @@
+> As of 2019 I no longer use this. IPNS resolution took too much time for efficient operation of the site. However, if you only use IPFS names, you should be good!
+
 # my IPFS blog stack
 
 This is the Docker service I use to deploy my Jekyll blog at
